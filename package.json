@@ -16,6 +16,7 @@
     "compile": "tsc",
     "fix": "gts fix",
     "dev": "nodemon -r dotenv/config --exec ts-node src/index.ts",
+    "start": "node build/src/index.js",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run lint"
