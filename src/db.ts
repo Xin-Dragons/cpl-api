@@ -191,17 +191,6 @@ export async function getRoyalties({ collection, type, before, after }: { collec
   }
 }
 
-function formatSummary(data: any, pretty: boolean) {
-  return mapValues(data, (item, key) => {
-    if (!item || (typeof item === 'string')) {
-      return item
-    }
-
-    const number = key === 'paid' ? (item / LAMPORTS_PER_SOL).toFixed(2) : (item || 0).toFixed(2)
-    return pretty ? numberWithCommas(number) : number
-  })
-}
-
 export async function getWalletSummary({ publicKey, pretty = false }: { publicKey: string, pretty?: boolean }) {
   const { data, error } = await supabase
     .rpc('get_royalties_for_wallet', { public_key: publicKey })
@@ -211,7 +200,7 @@ export async function getWalletSummary({ publicKey, pretty = false }: { publicKe
     throw new Error('Error looking up summary for wallet')
   }
 
-  return formatSummary(data, pretty);
+  return data
 }
 
 export async function getOutstandingForWallet({ publicKey }: { publicKey: string }) {
@@ -382,16 +371,6 @@ export async function royaltiesRepaymentCompleted({
         repaid_by: txn.address
       })
       .match({ id: sale.data.id, mint: sale.data.mint })
-
-    // const { data, error } = await supabase
-    //   .rpc('settle_debt', {
-    //     sale_id: sale.data.id,
-    //     sale_settled: new Date().toUTCString(),
-    //     sale_repayment_transaction: txnId,
-    //     sale_repaid_by: txn.address
-    //   })
-
-    console.log(data, error)
 
     if (error) {
       console.log(error)
