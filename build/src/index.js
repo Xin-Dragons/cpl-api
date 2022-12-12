@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const api_1 = require("./api");
-const app = (0, api_1.API)();
 const port = process.env.PORT;
 const server = (0, api_1.API)().listen(port, (err) => {
     if (err) {

@@ -32,7 +32,7 @@ interface MintAndCollectionParams extends CollectionParams {
   mint: string;
 }
 
-export async function getCollections({ limit }: { limit?: number }) {
+export async function getCollections({ limit }: { limit?: number } = {}) {
   const { data, error } = await supabase
     .rpc('get_collections_with_royalties', { rows: limit })
   
