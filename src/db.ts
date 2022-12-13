@@ -15,7 +15,7 @@ const supabase = createClient(DB_URL, DB_SECRET);
 
 interface Pagination {
   limit?: number;
-  offset?: number;
+  page?: number;
   orderBy?: string;
 }
 
@@ -32,9 +32,9 @@ interface MintAndCollectionParams extends CollectionParams {
   mint: string;
 }
 
-export async function getCollections({ limit }: { limit?: number } = {}) {
+export async function getCollections({ limit, page }: { limit?: number, page?: number } = {}) {
   const { data, error } = await supabase
-    .rpc('get_collections_with_royalties', { rows: limit })
+    .rpc('get_collections_with_royalties', { rows: limit, page })
   
     if (error) {
       console.error(error)
@@ -45,22 +45,16 @@ export async function getCollections({ limit }: { limit?: number } = {}) {
 }
 
 export async function getCollection({ collection }: CollectionParams) {
+  if (!collection) {
+    const { data, error } = await supabase
+      .rpc('count_nfts')
+
+    console.log(data, error)
+
+    return { num_mints: data };
+  }
   const { data, error } = await supabase
-    .from('collections')
-    .select(`
-      id,
-      collection,
-      first_verified_creator,
-      update_authority,
-      name,
-      image,
-      description,
-      project,
-      symbol
-    `)
-    .eq('id', collection)
-    .limit(1)
-    .single()
+    .rpc('get_collection_info', { coll: collection })
   
     if (error) {
       console.error(error)
@@ -82,12 +76,12 @@ export async function getRpcHosts() {
   return data.map(d => d.url)
 }
 
-export async function getMints({ collection, limit, offset, orderBy, publicKey }: CollectionParams) {
+export async function getMints({ collection, limit, page, orderBy, publicKey }: CollectionParams) {
   const method = orderBy === 'debt_lamports'
     ? 'get_mints_with_royalties_for_collection_sort_by_outstanding'
     : 'get_mints_with_royalties_for_collection_sort_by_paid'
   const { data, error } = await supabase
-    .rpc(method, { coll: collection, rows: limit, start: offset, order_by: orderBy, public_key: publicKey })
+    .rpc(method, { coll: collection, rows: limit, page, order_by: orderBy, public_key: publicKey })
 
   if (error) {
     console.error(error)
@@ -377,4 +371,17 @@ export async function royaltiesRepaymentCompleted({
       throw new Error('Error settling debt')
     }
   }
+}
+
+export async function getAllCollections() {
+  const { data, error } = await supabase
+    .from('collections')
+    .select('*')
+    .order('id', { ascending: true })
+
+  if (error) {
+    throw new Error('Error looking up all collections')
+  }
+
+  return data;
 }

@@ -9,6 +9,7 @@ export function collections() {
   router.use(limiter(10, 1))
 
   router.get('/', handleGetCollections)
+  router.get('/collection-info', handleGetCollection)
   router.get('/:collection', handleGetCollection)
   router.get('/:collection/holders', handleGetHolders)
   router.get('/:collection/wallets', handleGetLeaderboard)
