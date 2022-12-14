@@ -49,8 +49,6 @@ export async function getCollection({ collection }: CollectionParams) {
     const { data, error } = await supabase
       .rpc('count_nfts')
 
-    console.log(data, error)
-
     return { num_mints: data };
   }
   const { data, error } = await supabase
@@ -144,8 +142,6 @@ export async function getHolders({ collection }: CollectionParams) {
 }
 
 export async function getSummary({ collection, publicKey }: { collection?: string, publicKey?: string } = {}) {
-
-  console.log({publicKey})
   const { data, error } = await supabase
     .rpc('get_royalties_summary', { coll: collection, public_key: publicKey })
 
@@ -153,8 +149,6 @@ export async function getSummary({ collection, publicKey }: { collection?: strin
     console.log(error);
     throw new Error('Error looking up summary');
   }
-
-  console.log(data)
 
   return data
 }
@@ -381,6 +375,49 @@ export async function getAllCollections() {
 
   if (error) {
     throw new Error('Error looking up all collections')
+  }
+
+  return data;
+}
+
+export async function addCollection({
+  name,
+  symbol,
+  slug,
+  collection,
+  updateAuthority,
+  firstVerifiedCreator,
+  image,
+  description
+}: {
+  name: string,
+  symbol: string,
+  slug: string,
+  collection?: string,
+  updateAuthority: string,
+  firstVerifiedCreator: string,
+  image: string,
+  description: string
+}) {
+  const { data, error } = await supabase
+    .from('collections')
+    .insert({
+      id: slug,
+      name,
+      symbol,
+      collection,
+      update_authority: updateAuthority,
+      first_verified_creator: firstVerifiedCreator,
+      image,
+      description,
+      poll_mints: true
+    })
+    .select('*')
+    .single();
+
+  if (error) {
+    console.log(error)
+    throw new Error('Error adding collection')
   }
 
   return data;

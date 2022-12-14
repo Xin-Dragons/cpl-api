@@ -3,3 +3,4 @@ export * from './get-collection';
 export * from './get-mint';
 export * from './get-holders';
 export * from './get-collections';
+export * from './add-collection';
