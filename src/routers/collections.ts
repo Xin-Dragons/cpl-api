@@ -4,11 +4,12 @@ import { limiter } from "../middleware";
 import { handleGetLeaderboard } from "../handlers/royalties/wallet";
 import { validateMessage } from "../middleware/validate-message";
 import bodyParser from 'body-parser';
+import { handleGetCollectionRoyalties } from "../handlers/collections/get-collection-royalties";
 
 export function collections() {
   const router = Router({ mergeParams: true });
 
-  router.use(limiter(10, 1))
+  router.use(limiter(1, 2))
 
   router.get('/', handleGetCollections)
   router.post('/', bodyParser.json(), validateMessage('new-collection'), handleAddCollection)
@@ -18,6 +19,7 @@ export function collections() {
   router.get('/:collection/wallets', handleGetLeaderboard)
   router.get('/:collection/mints', handleGetMints)
   router.get('/:collection/mint(s)/:mint', handleGetMint)
+  router.get('/:collection/royalties/:mint?', handleGetCollectionRoyalties)
 
   return router;
 }

@@ -89,6 +89,42 @@ export async function getMints({ collection, limit, page, orderBy, publicKey }: 
   return data
 }
 
+export async function lookupApiKey(apiKey: string) {
+  const { data, error } = await supabase
+    .from('cpl-api-access')
+    .select('*')
+    .eq('api_key', apiKey)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error('Error looking up API key')
+  }
+
+  return data;
+}
+
+export async function getCollectionWithRoyalties(collection: string, mint?: string, publicKey?: string) {
+  const params = {
+    coll: collection
+  } as any;
+  if (mint) {
+    params.mint = mint;
+  }
+  if (publicKey) {
+    params.public_key = publicKey
+  }
+  const { data, error } = await supabase
+    .rpc('get_nft_with_royalties', params);
+
+  if (error) {
+    console.log(error)
+    throw new Error('Error looking up mints')
+  }
+
+  return data;
+}
+
 export async function getMint({ collection, mint }: MintAndCollectionParams) {
   const { data, error } = await supabase
     .from('nfts')
