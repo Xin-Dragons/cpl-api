@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { lookupApiKey } from "../db";
 
-export async function auth(req: Request, res: Response, next: NextFunction) {
+export interface RequestWithConfig extends Request {
+  disableRateLimit?: boolean;
+}
+
+export async function auth(req: RequestWithConfig, res: Response, next: NextFunction) {
   try {
     const { authorization } = req.headers;
   
@@ -18,6 +22,10 @@ export async function auth(req: Request, res: Response, next: NextFunction) {
   
     if (!client.active) {
       throw new Error('API key inactive');
+    }
+
+    if (client.disable_rate_limit) {
+      req.disableRateLimit = true;
     }
   
     next();
