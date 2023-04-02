@@ -333,6 +333,33 @@ export async function royaltiesRepaymentStarted({
   return data; 
 }
 
+export async function getSalesOverTime(
+  collection: string,
+) {
+  console.log(collection)
+  const { data, error } = await supabase
+    .rpc('get_sales_over_time', { coll: collection })
+
+  if (error) {
+    console.log(error)
+    throw new Error('Error getting sales over time for collection')
+  }
+
+  return data
+}
+
+export async function getWeeklyLeaders() {
+  const { data, error } = await supabase
+    .rpc('get_weekly_leaders')
+
+  if (error) {
+    console.log(error)
+    throw new Error("Error getting weekly leaders")
+  }
+
+  return data;
+}
+ 
 export async function getPendingRoyaltiesRepaymentTransaction({
   txnId,
   mint
