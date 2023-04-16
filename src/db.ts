@@ -336,7 +336,6 @@ export async function royaltiesRepaymentStarted({
 export async function getSalesOverTime(
   collection: string,
 ) {
-  console.log(collection)
   const { data, error } = await supabase
     .rpc('get_sales_over_time', { coll: collection })
 

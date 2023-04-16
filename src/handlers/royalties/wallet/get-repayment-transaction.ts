@@ -1,12 +1,11 @@
-import { PublicKey, SystemProgram, Transaction, TransactionInstruction, Connection } from '@solana/web3.js';
+import { PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { NextFunction, Request, Response } from "express";
 import { getRepaidForWallet, getMostRecentSale } from '../../../db';
 import bs58 from 'bs58';
 import BN from 'bn.js';
+import { connection } from '../../../helpers';
 
 const MEMO_PROGRAM_KEY = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'
-
-const connection = new Connection(process.env.RPC_URL as string, 'confirmed');
 
 interface Creator {
   share: number,
