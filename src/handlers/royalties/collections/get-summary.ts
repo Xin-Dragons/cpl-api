@@ -3,9 +3,9 @@ import { getSummary } from '../../../db';
 
 export async function handleGetSummary(req: Request, res: Response, next: NextFunction) {
   const { collection } = req.params;
-  const { publicKey }: { publicKey?: string } = req.query;
+  const { publicKey, days }: { publicKey?: string, days?: string } = req.query;
   try {
-    const summary = await getSummary({ collection, publicKey });
+    const summary = await getSummary({ collection, publicKey, days: days ? parseInt(days) : undefined });
 
     res.status(200).end(JSON.stringify(summary, null, 2))
   } catch (err: any) {

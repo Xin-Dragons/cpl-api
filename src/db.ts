@@ -177,9 +177,9 @@ export async function getHolders({ collection }: CollectionParams) {
     }, {})
 }
 
-export async function getSummary({ collection, publicKey }: { collection?: string, publicKey?: string } = {}) {
+export async function getSummary({ collection, publicKey, days }: { collection?: string, publicKey?: string, days?: number } = {}) {
   const { data, error } = await supabase
-    .rpc('get_royalties_summary', { coll: collection, public_key: publicKey })
+    .rpc('get_royalties_summary_beta', { coll: collection, public_key: publicKey, days })
 
   if (error) {
     console.log(error);
