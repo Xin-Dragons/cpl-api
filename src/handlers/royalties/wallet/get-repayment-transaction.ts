@@ -4,12 +4,13 @@ import { getRepaidForWallet, getMostRecentSale } from '../../../db';
 import bs58 from 'bs58';
 import BN from 'bn.js';
 import { connection } from '../../../helpers';
+import { Metaplex } from '@metaplex-foundation/js';
 
 const MEMO_PROGRAM_KEY = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'
 
 interface Creator {
   share: number,
-  address: string,
+  address: PublicKey,
   verified: boolean
 }
 
@@ -30,7 +31,7 @@ async function getRepaymentTransaction({
   const instructions = creators.filter(c => c.share).map(c => {
     const instruction = SystemProgram.transfer({
       fromPubkey: publicKey,
-      toPubkey: new PublicKey(c.address),
+      toPubkey: c.address,
       lamports: debt
         .div(new BN(100))
         .mul(new BN(c.share))
@@ -68,6 +69,8 @@ async function getRepaymentTransaction({
   return bs58.encode(txn.serialize({ verifySignatures: false }));
 }
 
+const metaplex = Metaplex.make(connection)
+
 export async function handleGetRepaymentTransaction(req: Request, res: Response, next: NextFunction) {
   const publicKey: string = req.params.publicKey;
   const mint: string = req.params.mint;
@@ -87,10 +90,12 @@ export async function handleGetRepaymentTransaction(req: Request, res: Response,
       throw new Error('Royalties already repaid for mint');
     }
 
+    const nft = await metaplex.nfts().findByMint({ mintAddress: new PublicKey(sale.mint) })
+
     const txn = await getRepaymentTransaction({
       publicKey: new PublicKey(publicKey),
       debt: new BN(sale.debt_lamports),
-      creators: sale.creators,
+      creators: nft.creators,
       mint: new PublicKey(sale.mint)
     });
 
